@@ -4,7 +4,7 @@ declare interface Math {
 
 
 //% color=#27b0ba icon="\uf26c"
-namespace OLED {
+namespace DsOLED {
     let font: Buffer;
 
 
