@@ -5,11 +5,8 @@ declare interface Math {
     floor(x: number): number;
 }
 
-const is_debug = false
-
-
 //% block="OLED屏" color=#27b0ba icon="\uf26c"
-namespace DsOLED {
+export namespace DsOLED {
     const SSD1306_SETCONTRAST = 0x81
     const SSD1306_SETCOLUMNADRESS = 0x21
     const SSD1306_SETPAGEADRESS = 0x22
@@ -153,8 +150,8 @@ namespace DsOLED {
             if (charX > displayWidth - 6) {
                 newLine()
             }
-            drawText(charX, charY, str.charAt(i))
-            charX += 6
+            let fontWidth = drawFont(charX, charY, str.charAt(i))
+            charX += fontWidth
         }
     }
     //% block="显示数字 $n"
@@ -182,15 +179,31 @@ namespace DsOLED {
         charX = xOffset
     }
 
-    function drawText(x: number, y: number, c: string) {
+    /**
+     * 绘制文字(中英文混排)
+     * @param x 横坐标
+     * @param y 纵坐标
+     * @param c 文字
+     */
+    function drawFont(x: number, y: number, c: string): number {
+        let fontWidth = 8
         let charIndex = c.charCodeAt(0)
         if (charIndex < 256) {
             drawChar(x, y, c)
+            fontWidth = 6
         } else {
-            drawCn(x, y, c)
+            drawCn(x, y, c, 1)
         }
+        return fontWidth
     }
 
+
+    /**
+     * 绘制字符
+     * @param x 横坐标
+     * @param y 纵坐标
+     * @param c accii码字符
+     */
     function drawChar(x: number, y: number, c: string) {
         command(SSD1306_SETCOLUMNADRESS)
         command(x)
@@ -204,27 +217,34 @@ namespace DsOLED {
         if (charHexs.length < 10) {
             charHexs = DsTools.padZeroStart(charHexs, 10, 'F')
         }
-        is_debug && console.log(c, charIndex, charHexs || 'NaN')
+        // console.log(c, charIndex, charHexs || 'NaN')
 
         let line = pins.createBuffer(2)
         line[0] = 0x40
         for (let i = 0; i < 6; i++) {
             if (i === 5) {
                 line[1] = 0x00
-                is_debug && console.log(DsTools.spaceStr('0'), '0x00')
+                // console.log(DsTools.spaceStr('0'), '0x00')
             } else {
                 let pos = i * 2
                 let hex = charHexs.slice(pos, pos + 2)
                 let decimal = parseInt('0x' + hex, 16)
                 line[1] = decimal
-                const binary = decimal.toString(2)
-                is_debug && console.log(DsTools.spaceStr(binary), '0x' + hex)
+                const binary = DsTools.intToBinary(decimal)
+                // console.log(DsTools.spaceStr(binary), '0x' + hex)
             }
             pins.i2cWriteBuffer(chipAdress, line, false)
         }
     }
 
-    function drawCn(x: number, y: number, c: string) {
+    /**
+     * 绘制中文
+     * @param x 横坐标
+     * @param y 纵坐标
+     * @param c 中文字
+     * @param rotate  旋转次数（顺时针90度）
+     */
+    function drawCn(x: number, y: number, c: string, rotate = 0) {
         command(SSD1306_SETCOLUMNADRESS)
         command(x)
         command(x + 8)
@@ -237,7 +257,13 @@ namespace DsOLED {
         if (charHexs.length < 16) {
             charHexs = DsTools.padZeroStart(charHexs, 16, 'F')
         }
-        is_debug && console.log(charIndex, charHexs || 'NaN')
+        // console.log(charIndex, charHexs || 'NaN')
+
+        // 旋转次数
+        for (let i = 0; i < rotate % 4; i++) {
+            charHexs = DsTools.rotateFontData(charHexs)
+        }
+        // console.log(charIndex, charHexs || 'NaN')
 
         let line = pins.createBuffer(2)
         line[0] = 0x40
@@ -246,8 +272,8 @@ namespace DsOLED {
             let hex = charHexs.slice(pos, pos + 2)
             let decimal = parseInt('0x' + hex, 16)
             line[1] = decimal
-            const binary = decimal.toString(2)
-            is_debug && console.log(DsTools.spaceStr(binary), '0x' + hex)
+            const binary = DsTools.intToBinary(decimal)
+            // console.log(DsTools.spaceStr(binary), '0x' + hex)
 
             pins.i2cWriteBuffer(chipAdress, line, false)
         }
@@ -423,4 +449,4 @@ namespace DsOLED {
         loadPercent = 0
         clear()
     }
-} 
+}
