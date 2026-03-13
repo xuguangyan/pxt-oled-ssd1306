@@ -1,14 +1,14 @@
 {
-  "OLED.clear|block": "clear OLED display",
-  "OLED.drawLine|block": "draw line from:|x: $x0 y: $y0 to| x: $x1 y: $y1",
-  "OLED.drawLoading|block": "draw loading bar at $percent percent",
-  "OLED.drawRectangle|block": "draw rectangle from:|x: $x0 y: $y0 to| x: $x1 y: $y1",
-  "OLED.init|block": "initialize OLED with width $width height $height",
-  "OLED.newLine|block": "insert newline",
-  "OLED.writeNumNewLine|block": "show number $n",
-  "OLED.writeNum|block": "show (without newline) number $n",
-  "OLED.writeStringNewLine|block": "show string $str",
-  "OLED.writeString|block": "show (without newline) string $str",
+  "DsOLED.clear|block": "clear OLED display",
+  "DsOLED.drawLine|block": "draw line from:|x: $x0 y: $y0 to| x: $x1 y: $y1",
+  "DsOLED.drawLoading|block": "draw loading bar at $percent percent",
+  "DsOLED.drawRectangle|block": "draw rectangle from:|x: $x0 y: $y0 to| x: $x1 y: $y1",
+  "DsOLED.init|block": "initialize OLED with width $width height $height",
+  "DsOLED.newLine|block": "insert newline",
+  "DsOLED.writeNumNewLine|block": "show number $n",
+  "DsOLED.writeNum|block": "show (without newline) number $n",
+  "DsOLED.writeStringNewLine|block": "show string $str",
+  "DsOLED.writeString|block": "show (without newline) string $str",
   "{id:category}Math": "Math",
-  "{id:category}OLED": "OLED"
+  "{id:category}OLED": "DsOLED"
 }

@@ -187,14 +187,18 @@ namespace DsOLED {
         command(SSD1306_SETPAGEADRESS)
         command(y)
         command(y + 1)
+        let charIndex = c.charCodeAt(0)
         let line = pins.createBuffer(2)
         line[0] = 0x40
         for (let i = 0; i < 6; i++) {
             if (i === 5) {
                 line[1] = 0x00
             } else {
-                let charIndex = c.charCodeAt(0)
-                let charNumber = font.getNumber(NumberFormat.UInt8BE, 5 * charIndex + i)
+                let pos = 5 * charIndex + i
+                let charNumber = 0xFF
+                if (pos < font.length) {
+                    charNumber = font.getNumber(NumberFormat.UInt8BE, pos)
+                }
                 line[1] = charNumber
 
             }
@@ -264,7 +268,7 @@ namespace DsOLED {
         y1 -= y0; ky = 0; if (y1 > 0) ky = +1; if (y1 < 0) { ky = -1; y1 = -y1; } y1++;
         if (x1 >= y1) {
             c = x1
-            for (i = 0; i < x1; i++ , x0 += kx) {
+            for (i = 0; i < x1; i++, x0 += kx) {
                 pixels.push([x0, y0])
                 c -= y1; if (c <= 0) { if (i != x1 - 1) pixels.push([x0 + kx, y0]); c += x1; y0 += ky; if (i != x1 - 1) pixels.push([x0, y0]); }
                 if (pixels.length > 20) {
@@ -276,7 +280,7 @@ namespace DsOLED {
             }
         } else {
             c = y1
-            for (i = 0; i < y1; i++ , y0 += ky) {
+            for (i = 0; i < y1; i++, y0 += ky) {
                 pixels.push([x0, y0])
                 c -= x1; if (c <= 0) { if (i != y1 - 1) pixels.push([x0, y0 + ky]); c += y1; x0 += kx; if (i != y1 - 1) pixels.push([x0, y0]); }
                 if (pixels.length > 20) {
@@ -311,17 +315,17 @@ namespace DsOLED {
         let theta = 0;
         let step = Math.PI / 90;  // Adjust step for smoothness
         let pixels: Array<Array<number>> = [];
-    
+
         while (theta < 2 * Math.PI) {
             let xPos = Math.floor(x + r * Math.cos(theta));
             let yPos = Math.floor(y + r * Math.sin(theta));
             pixels.push([xPos, yPos]);
             theta += step;
         }
-    
+
         drawShape(pixels);
     }
-    
+
     //% block="draw filled circle at x: $x y: $y radius: $r"
     //% x.defl=64
     //% y.defl=32
