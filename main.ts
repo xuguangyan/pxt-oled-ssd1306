@@ -187,10 +187,7 @@ namespace DsOLED {
         command(SSD1306_SETPAGEADRESS)
         command(y)
         command(y + 1)
-        let charIndex = 0
-        try {
-            charIndex = c.charCodeAt(0)
-        } catch (e) { }
+        let charIndex = c.charCodeAt(0)
         let line = pins.createBuffer(2)
         line[0] = 0x40
         for (let i = 0; i < 6; i++) {
@@ -198,7 +195,8 @@ namespace DsOLED {
                 line[1] = 0x00
             } else {
                 let pos = 5 * charIndex + i
-                let charNumber = 0xFF
+                // let charNumber = 0xFF
+                let charNumber = parseInt('0xFF', 16)
                 if (pos < font.length) {
                     charNumber = font.getNumber(NumberFormat.UInt8BE, pos)
                 }
