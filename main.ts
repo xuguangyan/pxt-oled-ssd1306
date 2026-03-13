@@ -197,7 +197,7 @@ namespace DsOLED {
                 let pos = 5 * charIndex + i
                 let charNumber = 0xFF
                 if (pos < font.length) {
-                    charNumber = font.getNumber(NumberFormat.UInt8BE, pos)
+                    // charNumber = font.getNumber(NumberFormat.UInt8BE, pos)
                 }
                 line[1] = charNumber
 
