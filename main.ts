@@ -5,8 +5,16 @@ declare interface Math {
     floor(x: number): number;
 }
 
+/**
+ * 汉字点阵类型
+ */
+enum DotType {
+    Dot_8x8 = 8,
+    Dot_16x16 = 16
+}
+
 //% block="OLED屏" color=#27b0ba icon="\uf26c"
-export namespace DsOLED {
+namespace DsOLED {
     const SSD1306_SETCONTRAST = 0x81
     const SSD1306_SETCOLUMNADRESS = 0x21
     const SSD1306_SETPAGEADRESS = 0x22
@@ -40,6 +48,7 @@ export namespace DsOLED {
     let screenSize = 0
     let loadStarted: boolean;
     let loadPercent: number;
+    let dotType = DotType.Dot_16x16
     function command(cmd: number) {
         let buf = pins.createBuffer(2)
         buf[0] = 0x00
@@ -147,7 +156,7 @@ export namespace DsOLED {
     //% weight=6
     export function writeString(str: string) {
         for (let i = 0; i < str.length; i++) {
-            if (charX > displayWidth - 6) {
+            if (charX > displayWidth - 8) {
                 newLine()
             }
             let fontWidth = drawFont(charX, charY, str.charAt(i))
@@ -175,7 +184,11 @@ export namespace DsOLED {
     //% block="新行"
     //% weight=4
     export function newLine() {
-        charY++
+        let fontLines = 1 // 字体行高（占page数）
+        if (dotType == DotType.Dot_16x16) {
+            fontLines = 2 // 16点阵占2行
+        }
+        charY += fontLines
         charX = xOffset
     }
 
@@ -186,16 +199,26 @@ export namespace DsOLED {
      * @param c 文字
      */
     function drawFont(x: number, y: number, c: string): number {
-        let fontWidth = 8
-        if (DsTools.isAsciiChar(c)) {
+        let fontWidth = 6
+        // if (DsTools.isAsciiChar(c)) {
+        if (isAsciiChar(c)) {
             drawChar(x, y, c)
-            fontWidth = 6
         } else {
-            drawCn(x, y, c, 1)
+            if (dotType == DotType.Dot_16x16) {
+                drawCn16(x, y, c, 1)
+                fontWidth = 16
+            } else {
+                drawCn(x, y, c, 1)
+                fontWidth = 8
+            }
+
         }
         return fontWidth
     }
 
+    function isAsciiChar(c: string): boolean {
+        return !DsFonts.font_cn16.includes(c)
+    }
 
     /**
      * 绘制字符
@@ -237,7 +260,7 @@ export namespace DsOLED {
     }
 
     /**
-     * 绘制中文
+     * 绘制中文（8x8点阵）
      * @param x 横坐标
      * @param y 纵坐标
      * @param c 中文字
@@ -273,6 +296,54 @@ export namespace DsOLED {
             line[1] = decimal
             const binary = DsTools.intToBinary(decimal)
             // console.log(DsTools.spaceStr(binary), '0x' + hex)
+
+            pins.i2cWriteBuffer(chipAdress, line, false)
+        }
+    }
+
+    /**
+     * 绘制中文（16x16点阵）
+     * @param x 横坐标
+     * @param y 纵坐标
+     * @param c 中文字
+     * @param rotate  旋转次数（顺时针90度）
+     */
+    function drawCn16(x: number, y: number, c: string, rotate = 0) {
+        command(SSD1306_SETCOLUMNADRESS)
+        command(x)
+        command(x + 16)
+        command(SSD1306_SETPAGEADRESS)
+        command(y)
+        command(y + 2)
+        let charIndex = DsFonts.font_cn16.indexOf(c)
+        let pos = 16 * charIndex * 4
+        let charHexs = DsFonts.font_cn_hex16.slice(pos, pos + 64)
+        if (charHexs.length < 64) {
+            charHexs = DsTools.padZeroStart(charHexs, 64, 'F')
+        }
+        // console.log(charIndex, charHexs || 'NaN')
+
+        // 旋转次数
+        for (let i = 0; i < rotate % 4; i++) {
+            charHexs = DsTools.rotateFontData(charHexs, 16)
+        }
+        // console.log(charIndex, charHexs || 'NaN')
+
+        let line = pins.createBuffer(2)
+        line[0] = 0x40
+        for (let i = 0; i < 16; i++) {
+            let pos = i * 4
+            let hex2 = charHexs.slice(pos + 2, pos + 4)
+            let decimal2 = parseInt('0x' + hex2, 16)
+            line[1] = decimal2
+
+            pins.i2cWriteBuffer(chipAdress, line, false)
+        }
+        for (let i = 0; i < 16; i++) {
+            let pos = i * 4
+            let hex1 = charHexs.slice(pos, pos + 2)
+            let decimal1 = parseInt('0x' + hex1, 16)
+            line[1] = decimal1
 
             pins.i2cWriteBuffer(chipAdress, line, false)
         }
@@ -409,11 +480,11 @@ export namespace DsOLED {
             drawLine(x + dx, y - height, x + dx, y + height);
         }
     }
-    //% block="OLED 初始化 宽 %width 高 %height"
+    //% block="OLED 初始化 宽 %width 高 %height 字体 %type"
     //% width.defl=128
     //% height.defl=64
     //% weight=9
-    export function init(width: number, height: number) {
+    export function init(width: number, height: number, type: DotType) {
         command(SSD1306_DISPLAYOFF);
         command(SSD1306_SETDISPLAYCLOCKDIV);
         command(0x80);                                  // the suggested ratio 0x80
@@ -446,6 +517,7 @@ export namespace DsOLED {
         charY = yOffset
         loadStarted = false
         loadPercent = 0
+        dotType = type
         clear()
     }
 }

@@ -73,8 +73,8 @@ export namespace DsTools {
         return padding + str
     }
 
-    export function spaceStr(value: string): string {
-        let str = padZeroStart(value, 8, '0')
+    export function spaceStr(value: string, width: number = 8): string {
+        let str = padZeroStart(value, width, '0')
         return str.split('').join(' ')
     }
 
@@ -134,13 +134,14 @@ export namespace DsTools {
      * @param charHexs Hex字符串
      * @returns 
      */
-    export function rotateFontData(charHexs: string): string {
+    export function rotateFontData(charHexs: string, width: number = 8): string {
         const matrix = [] // 将rowData转二维数组
-        for (let i = 0; i < 8; i++) {
-            let pos = i * 2
-            let hex = charHexs.slice(pos, pos + 2)
+        const rate = Math.ceil(width / 8)
+        for (let i = 0; i < width; i++) {
+            let pos = i * 2 * rate
+            let hex = charHexs.slice(pos, pos + 2 * rate)
             let binStr = hexToBinary('0x' + hex)
-            binStr = padZeroStart(binStr, 8, '0')
+            binStr = padZeroStart(binStr, width, '0')
             matrix.push(binStr.split(''))
         }
         const rotated = rotateMatrix(matrix)

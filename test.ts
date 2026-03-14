@@ -36,7 +36,7 @@ function drawChar(c: string) {
 }
 
 /**
- * 绘制中文
+ * 绘制中文（8x8点阵）
  * @param c 中文字
  * @param rotate 旋转次数（顺时针90度）
  */
@@ -66,11 +66,44 @@ function drawCn(c: string, rotate = 0) {
     }
 }
 
+/**
+ * 绘制中文（16x16点阵）
+ * @param c 中文字
+ * @param rotate 旋转次数（顺时针90度）
+ */
+function drawCn16(c: string, rotate = 0) {
+    let charIndex = DsFonts.font_cn16.indexOf(c)
+    let pos = 16 * charIndex * 4
+    let charHexs = DsFonts.font_cn_hex16.slice(pos, pos + 64)
+    if (charHexs.length < 64) {
+        charHexs = DsTools.padZeroStart(charHexs, 64, 'F')
+    }
+    console.log(charIndex, charHexs || 'NaN')
+    // 旋转次数
+    for (let i = 0; i < rotate % 4; i++) {
+        charHexs = DsTools.rotateFontData(charHexs, 16)
+    }
+    console.log(charIndex, charHexs || 'NaN')
+    let line = new Array(2)
+    line[0] = 0x40
+    for (let i = 0; i < 16; i++) {
+        let pos = i * 4
+        let hex = charHexs.slice(pos, pos + 4)
+        let decimal = parseInt('0x' + hex, 16)
+        line[1] = decimal
+        const binary = DsTools.intToBinary(decimal)
+        console.log(DsTools.spaceStr(binary, 16), '0x' + hex)
+        // console.log(line)
+    }
+}
+
 // drawChar('1')
 // drawChar('你')
 
 // drawCn('a')
-// drawCn('你', 1)
+// drawCn('你', 0)
 
-console.log(DsTools.isAsciiChar('a'))
-console.log(DsTools.isAsciiChar('你'))
+drawCn16('你', 0)
+
+// console.log(DsTools.isAsciiChar('a'))
+// console.log(DsTools.isAsciiChar('你'))
