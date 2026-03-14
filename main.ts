@@ -187,8 +187,7 @@ export namespace DsOLED {
      */
     function drawFont(x: number, y: number, c: string): number {
         let fontWidth = 8
-        let charIndex = c.charCodeAt(0)
-        if (charIndex < 256) {
+        if (DsTools.isAsciiChar(c)) {
             drawChar(x, y, c)
             fontWidth = 6
         } else {

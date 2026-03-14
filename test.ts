@@ -66,8 +66,11 @@ function drawCn(c: string, rotate = 0) {
     }
 }
 
-drawChar('1')
+// drawChar('1')
 // drawChar('你')
 
 // drawCn('a')
-drawCn('你', 1)
+// drawCn('你', 1)
+
+console.log(DsTools.isAsciiChar('a'))
+console.log(DsTools.isAsciiChar('你'))

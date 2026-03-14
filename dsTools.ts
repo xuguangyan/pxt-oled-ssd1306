@@ -152,4 +152,11 @@ export namespace DsTools {
         return rstHexs
     }
 
+    export function isAsciiChar(c: string): boolean {
+        // let charIndex = c.charCodeAt(0)
+        // return charIndex <= 256
+        const font_en = ' !"#$%&\'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\]^_`abcdefghijklmnopqrstuvwxyz{|}~'
+        return font_en.includes(c)
+    }
+
 }
