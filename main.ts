@@ -217,7 +217,7 @@ namespace DsOLED {
     }
 
     function isAsciiChar(c: string): boolean {
-        return !DsFonts.font_cn16.includes(c)
+        return !DsFonts.font_cn.includes(c)
     }
 
     /**
@@ -275,7 +275,7 @@ namespace DsOLED {
         command(y + 1)
         let charIndex = DsFonts.font_cn.indexOf(c)
         let pos = 8 * charIndex * 2
-        let charHexs = DsFonts.font_cn_hex.slice(pos, pos + 16)
+        let charHexs = DsFonts.font_cn_hex8.slice(pos, pos + 16)
         if (charHexs.length < 16) {
             charHexs = DsTools.padZeroStart(charHexs, 16, 'F')
         }
@@ -315,7 +315,7 @@ namespace DsOLED {
         command(SSD1306_SETPAGEADRESS)
         command(y)
         command(y + 2)
-        let charIndex = DsFonts.font_cn16.indexOf(c)
+        let charIndex = DsFonts.font_cn.indexOf(c)
         let pos = 16 * charIndex * 4
         let charHexs = DsFonts.font_cn_hex16.slice(pos, pos + 64)
         if (charHexs.length < 64) {

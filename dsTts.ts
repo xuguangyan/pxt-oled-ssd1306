@@ -1,5 +1,5 @@
 import { DsTools } from './dsTools'
-import { DsFonts } from './dsFont'
+import { DsCharset } from './dsCharset'
 
 //% block="语音合成" color=#276f86 icon="\uf7d9"
 namespace DsTTS {
@@ -18,7 +18,17 @@ namespace DsTTS {
     }
 
     function isAsciiChar(c: string): boolean {
-        return !DsFonts.font_cn16_words.includes(c)
+        return !DsCharset.char_cn.includes(c)
+    }
+
+    function findCharset(c: string): number {
+        // return !DsCharset.char_cn.includes(c)
+        for (let i = 0; i < DsCharset.char_cn.length; i++) {
+            if (DsCharset.char_cn.charAt(i) == c) {
+                return i
+            }
+        }
+        return -1
     }
 
     function send_data(cmd: string, hex: string) {
@@ -34,14 +44,16 @@ namespace DsTTS {
         let strHex = ""
         for (let i = 0; i < str.length; i++) {
             let c = str.charAt(i)
-            if (isAsciiChar(c)) {
+            let charIndex = findCharset(c)
+            // if (isAsciiChar(c)) {
+            if (charIndex < 0) {
                 let code = c.charCodeAt(0)
                 let charHexs = DsTools.padStart(DsTools.intToHex(code), 2, '0')
                 strHex += charHexs
             } else {
-                let charIndex = DsFonts.font_cn16_words.indexOf(c)
+                // let charIndex = DsCharset.char_cn.indexOf(c)
                 let pos = charIndex * 4
-                let charHexs = DsFonts.font_cn_gb2312.slice(pos, pos + 4)
+                let charHexs = DsCharset.char_cn_gb2312.slice(pos, pos + 4)
                 if (charHexs.length < 4) {
                     charHexs = DsTools.padZeroStart(charHexs, 4, '0')
                 }
