@@ -8,7 +8,12 @@
     },
     "files": [
         "README.md",
-        "main.ts"
+        "dsOled.ts",
+        "dsEsp8266.ts",
+        "dsTts.ts",
+        "dsCharset.ts",
+        "dsFont.ts",
+        "dsTools.ts"
     ],
     "testFiles": [
         "test.ts"

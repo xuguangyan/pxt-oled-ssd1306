@@ -9,7 +9,7 @@ namespace DsTTS {
     //% rx.defl=SerialPin.P1
     //% baudrate.defl=BaudRate.BaudRate9600
     //% weight=99
-    export function connectWifi(
+    export function initTTS(
         tx: SerialPin,
         rx: SerialPin,
         baudrate: BaudRate
