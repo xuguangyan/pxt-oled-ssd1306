@@ -1,7 +1,7 @@
 /**
  * Microbit for Typescript Tools
  */
-//% block="工具模块" color=#276f86 icon="\uf7d9"
+//% block="工具库" color=#276f86 icon="\uf0ad"
 //% groups="['string', 'other']"
 export namespace DsTools {
 
@@ -59,6 +59,10 @@ export namespace DsTools {
         return hex || '0'
     }
 
+    /**
+     * padStart
+     */
+    //% block="填充右对齐|字符串 = %str|固定长度 = %len|填充符 = %padStr"
     export function padStart(str: string, len: number, padStr: string): string {
         // 计算需要填充的字符数
         let padLength = len - str.length

@@ -1,7 +1,7 @@
 import { DsTools } from './dsTools'
 import { DsCharset } from './dsCharset'
 
-//% block="语音合成" color=#276f86 icon="\uf7d9"
+//% block="语音合成" color=#ffd43b icon="\uf028"
 namespace DsTTS {
 
     //% block="初始化合成|TX %tx|RX %rx|Baud rate %baudrate"
