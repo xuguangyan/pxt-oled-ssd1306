@@ -100,22 +100,32 @@ namespace DsEsp8266 {
   }
 
   /**
-   * Initialize ESP8266 module and connect it to Wifi router
+   * Initialize Wifi
    */
-  //% block="初始化wifi|RX (Tx of micro:bit) %tx|TX (Rx of micro:bit) %rx|Baud rate %baudrate|Wifi SSID = %ssid|Wifi PWD = %pwd"
+  //% block="初始化wifi|RX %tx|TX %rx|Baud rate %baudrate"
   //% tx.defl=SerialPin.P0
   //% rx.defl=SerialPin.P1
-  //% ssid.defl=ChinaNet-XU
-  //% pwd.defl=13710637730
-  export function connectWifi(
+  //% weight=100
+  export function initWifi(
     tx: SerialPin,
     rx: SerialPin,
-    baudrate: BaudRate,
+    baudrate: BaudRate
+  ) {
+    serial.redirect(tx, rx, baudrate)
+  }
+
+  /**
+   * Connect Wifi
+   */
+  //% block="连接wifi|Wifi SSID = %ssid|Wifi PWD = %pwd"
+  //% ssid.defl=ChinaNet-XU
+  //% pwd.defl=13710637730
+  //% weight=99
+  export function connectWifi(
     ssid: string,
     pwd: string,
   ) {
     wifi_connected = false
-    serial.redirect(tx, rx, baudrate)
     let rst: SrvResult = { success: false, msg: '', data: '' }
     let ok = send_cmd("+++", 1000, '', false)
     if (!ok) { wifiResponse(rst, '透传退出失败'); return; }
@@ -208,6 +218,7 @@ namespace DsEsp8266 {
   //% ip.defl=192.168.1.199
   //% port.defl=2999
   //% action.defl=noticeText
+  //% weight=31
   export function getRequest(
     ip: string,
     port: string,
@@ -224,6 +235,7 @@ namespace DsEsp8266 {
   //% ip.defl=192.168.1.199
   //% port.defl=2999
   //% action.defl=noticeText
+  //% weight=30
   export function get_request(
     ip: string,
     port: string,
@@ -240,6 +252,7 @@ namespace DsEsp8266 {
   //% ip.defl=192.168.1.199
   //% port.defl=2888
   //% action.defl=noticeText
+  //% weight=21
   export function tcpRequest(
     ip: string,
     port: string,
@@ -255,6 +268,7 @@ namespace DsEsp8266 {
   //% ip.defl=192.168.1.199
   //% port.defl=2888
   //% action.defl=noticeText
+  //% weight=20
   export function tcp_request(
     ip: string,
     port: string,
@@ -269,7 +283,7 @@ namespace DsEsp8266 {
    * @param handler Wifi callback
    */
   //% blockId=on_wifi_Change block="当Wifi改变时"
-  //% weight=94
+  //% weight=18
   export function on_wifi_Change(
     handler: (success: boolean, msg: string, data: string) => void,
   ): void {
@@ -281,7 +295,7 @@ namespace DsEsp8266 {
    * @param handler Connect callback
    */
   //% blockId=on_con_Callback block="当连接返回"
-  //% weight=94
+  //% weight=16
   export function on_con_Callback(
     handler: (success: boolean, msg: string, data: string) => void,
   ): void {
@@ -293,7 +307,7 @@ namespace DsEsp8266 {
    * @param handler request callback
    */
   //% blockId=on_req_callback block="当请求返回"
-  //% weight=94
+  //% weight=14
   export function on_req_callback(
     handler: (success: boolean, msg: string, data: string) => void,
   ): void {
@@ -304,9 +318,9 @@ namespace DsEsp8266 {
    * On Message Log
    * @param handler Connect callback
    */
-  //% blockId=on_message_log block="当有收发日志"
-  //% weight=94
-  export function on_message_log(
+  //% blockId=on_wifi_msg_log block="监听wifi日志"
+  //% weight=12
+  export function on_wifi_msg_log(
     handler: (msg: string) => void,
   ): void {
     writeLog = handler
@@ -317,6 +331,7 @@ namespace DsEsp8266 {
    */
   //% block="等待 %delay ms"
   //% delay.min=0 delay.defl=5000
+  //% weight=10
   export function wait(delay: number) {
     if (delay > 0) basic.pause(delay)
   }

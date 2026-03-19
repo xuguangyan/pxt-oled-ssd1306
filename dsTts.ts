@@ -1,12 +1,41 @@
 import { DsTools } from './dsTools'
 import { DsCharset } from './dsCharset'
 
+/**
+ * 编码类型
+ */
+enum CharsetType {
+    GB2312 = 0,
+    UTF_8 = 4
+}
+
 //% block="语音合成" color=#ffd43b icon="\uf028"
 namespace DsTTS {
+    let writeLog: (msg: string) => void
 
-    //% block="初始化合成|TX %tx|RX %rx|Baud rate %baudrate"
-    //% tx.defl=SerialPin.P0
-    //% rx.defl=SerialPin.P1
+    function logResponse(msg: string, sendType = true) {
+        if (writeLog) {
+            let msgType = sendType ? '>:' : '<:'
+            let msgTxt = sendType ? msg : msg.slice(0, 30)
+            writeLog(msgType + msgTxt)
+        }
+    }
+
+    /**
+     * On Message Log
+     * @param handler Connect callback
+     */
+    //% blockId=on_tts_msg_log block="监听tts日志"
+    //% weight=94
+    export function on_tts_msg_log(
+        handler: (msg: string) => void,
+    ): void {
+        writeLog = handler
+    }
+
+    //% block="初始化合成|RX %tx|TX %rx|Baud rate %baudrate"
+    //% tx.defl=SerialPin.P12
+    //% rx.defl=SerialPin.P13
     //% baudrate.defl=BaudRate.BaudRate9600
     //% weight=99
     export function initTTS(
@@ -31,16 +60,32 @@ namespace DsTTS {
         return -1
     }
 
-    function send_data(cmd: string, hex: string) {
+    function send_data(hex: string, type: CharsetType) {
         const lenHex = DsTools.padStart(DsTools.intToHex(hex.length / 2 + 2), 4, '0')
-        // 指定为GB2312编码：00
-        const cmdHex = "FD" + lenHex + cmd + "00" + hex
+        const typeHex = DsTools.padStart(DsTools.intToHex(type), 2, '0')
+        const cmd = '01'
+        const cmdHex = "FD" + lenHex + cmd + typeHex + hex
         serial.writeBuffer(Buffer.fromHex(cmdHex))
+        logResponse(cmdHex)
     }
 
-    //% block="合成语音 文字 %str"
+    //% block="合成语音 文字 %str 编码类型 %type"
+    //% type.defl=CharsetType.GB2312
+    //% weight=25
+    export function cmd_play(str: string, type: CharsetType) {
+        let strHex = ""
+        for (let i = 0; i < str.length; i++) {
+            let c = str.charAt(i)
+            let code = c.charCodeAt(0)
+            let charHexs = DsTools.padStart(DsTools.intToHex(code), 2, '0')
+            strHex += charHexs
+        }
+        send_data(strHex, type)
+    }
+
+    //% block="本地合成 文字 %str"
     //% weight=20
-    export function cmd_play(str: string) {
+    export function cmd_play_local(str: string) {
         let strHex = ""
         for (let i = 0; i < str.length; i++) {
             let c = str.charAt(i)
@@ -60,8 +105,7 @@ namespace DsTTS {
                 strHex += charHexs
             }
         }
-        const cmd = "01"
-        send_data(cmd, strHex)
+        send_data(strHex, CharsetType.GB2312)
     }
 
     //% block="停止合成"
