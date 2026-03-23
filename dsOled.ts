@@ -49,6 +49,39 @@ namespace DsOLED {
     let loadStarted: boolean;
     let loadPercent: number;
     let dotType = DotType.Dot_16x16
+
+    let font16: string[] = []
+    let font16_matrix: string[] = []
+
+    let font8: string[] = []
+    let font8_matrix: string[] = []
+
+    //% block="添加字符 $chr|点阵数据 $hex|到16x16字库"
+    //% chr.defl=""
+    //% hex.defl="64个hex字符"
+    //% blockExternalInputs=true
+    //% advanced=true
+    export function addCustomChr16(chr: string, hex: string) {
+        if (chr != null && chr.length == 1 && hex != null && hex.length > 0) {
+            // add new character
+            font16.push(chr)
+            font16_matrix.push(hex)
+        }
+    }
+
+    //% block="添加字符 $chr|点阵数据 $hex|到8x8字库"
+    //% chr.defl=""
+    //% hex.defl="16个hex字符"
+    //% blockExternalInputs=true
+    //% advanced=true
+    export function addCustomChr8(chr: string, hex: string) {
+        if (chr != null && chr.length == 1 && hex != null && hex.length > 0) {
+            // add new character
+            font8.push(chr)
+            font8_matrix.push(hex)
+        }
+    }
+
     function command(cmd: number) {
         let buf = pins.createBuffer(2)
         buf[0] = 0x00
@@ -217,7 +250,8 @@ namespace DsOLED {
     }
 
     function isAsciiChar(c: string): boolean {
-        return !DsFonts.font_cn.includes(c)
+        // return !DsFonts.font_cn.includes(c)
+        return DsFonts.font_en.includes(c)
     }
 
     /**
@@ -273,9 +307,17 @@ namespace DsOLED {
         command(SSD1306_SETPAGEADRESS)
         command(y)
         command(y + 1)
-        let charIndex = DsFonts.font_cn.indexOf(c)
-        let pos = 8 * charIndex * 2
-        let charHexs = DsFonts.font_cn_hex8.slice(pos, pos + 16)
+
+        let charHexs = ''
+        let charIndex = font8.indexOf(c)
+        if (charIndex >= 0) {
+            charHexs = font8_matrix[charIndex]
+        } else {
+            charIndex = DsFonts.font_cn.indexOf(c)
+            let pos = 8 * charIndex * 2
+            charHexs = DsFonts.font_cn_hex8.slice(pos, pos + 16)
+        }
+
         if (charHexs.length < 16) {
             charHexs = DsTools.padZeroStart(charHexs, 16, 'F')
         }
@@ -315,9 +357,17 @@ namespace DsOLED {
         command(SSD1306_SETPAGEADRESS)
         command(y)
         command(y + 2)
-        let charIndex = DsFonts.font_cn.indexOf(c)
-        let pos = 16 * charIndex * 4
-        let charHexs = DsFonts.font_cn_hex16.slice(pos, pos + 64)
+
+        let charHexs = ''
+        let charIndex = font16.indexOf(c)
+        if (charIndex >= 0) {
+            charHexs = font16_matrix[charIndex]
+        } else {
+            charIndex = DsFonts.font_cn.indexOf(c)
+            let pos = 16 * charIndex * 4
+            charHexs = DsFonts.font_cn_hex16.slice(pos, pos + 64)
+        }
+
         if (charHexs.length < 64) {
             charHexs = DsTools.padZeroStart(charHexs, 64, 'F')
         }

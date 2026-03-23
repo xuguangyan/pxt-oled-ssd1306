@@ -21,18 +21,6 @@ namespace DsTTS {
         }
     }
 
-    /**
-     * On Message Log
-     * @param handler Connect callback
-     */
-    //% blockId=on_tts_msg_log block="监听tts日志"
-    //% weight=94
-    export function on_tts_msg_log(
-        handler: (msg: string) => void,
-    ): void {
-        writeLog = handler
-    }
-
     //% block="初始化合成|RX %tx|TX %rx|Baud rate %baudrate"
     //% tx.defl=SerialPin.P12
     //% rx.defl=SerialPin.P13
@@ -60,32 +48,22 @@ namespace DsTTS {
         return -1
     }
 
-    function send_data(hex: string, type: CharsetType) {
-        const lenHex = DsTools.padStart(DsTools.intToHex(hex.length / 2 + 2), 4, '0')
-        const typeHex = DsTools.padStart(DsTools.intToHex(type), 2, '0')
-        const cmd = '01'
-        const cmdHex = "FD" + lenHex + cmd + typeHex + hex
-        serial.writeBuffer(Buffer.fromHex(cmdHex))
-        logResponse(cmdHex)
-    }
-
-    //% block="合成语音 文字 %str 编码类型 %type"
+    //% block="中文播报 字节hex %str 编码类型 %type"
     //% type.defl=CharsetType.GB2312
-    //% weight=25
-    export function cmd_play(str: string, type: CharsetType) {
-        let strHex = ""
-        for (let i = 0; i < str.length; i++) {
-            let c = str.charAt(i)
-            let code = c.charCodeAt(0)
-            let charHexs = DsTools.padStart(DsTools.intToHex(code), 2, '0')
-            strHex += charHexs
-        }
-        send_data(strHex, type)
+    //% weight=30
+    export function play_cn(hex: string, type: CharsetType) {
+        send_data(hex, type)
     }
 
-    //% block="本地合成 文字 %str"
+    //% block="远程(或英文)播报 字符 %str"
+    //% weight=25
+    export function play_en(str: string) {
+        cmd_play(str, CharsetType.UTF_8)
+    }
+
+    //% block="本地播报 文字 %str"
     //% weight=20
-    export function cmd_play_local(str: string) {
+    export function play_local(str: string) {
         let strHex = ""
         for (let i = 0; i < str.length; i++) {
             let c = str.charAt(i)
@@ -106,6 +84,26 @@ namespace DsTTS {
             }
         }
         send_data(strHex, CharsetType.GB2312)
+    }
+
+    function send_data(hex: string, type: CharsetType) {
+        const lenHex = DsTools.padStart(DsTools.intToHex(hex.length / 2 + 2), 4, '0')
+        const typeHex = DsTools.padStart(DsTools.intToHex(type), 2, '0')
+        const cmd = '01'
+        const cmdHex = "FD" + lenHex + cmd + typeHex + hex
+        serial.writeBuffer(Buffer.fromHex(cmdHex))
+        logResponse(cmdHex)
+    }
+
+    function cmd_play(str: string, type: CharsetType) {
+        let strHex = ""
+        for (let i = 0; i < str.length; i++) {
+            let c = str.charAt(i)
+            let code = c.charCodeAt(0)
+            let charHexs = DsTools.padStart(DsTools.intToHex(code), 2, '0')
+            strHex += charHexs
+        }
+        send_data(strHex, type)
     }
 
     //% block="停止合成"
@@ -188,5 +186,17 @@ namespace DsTTS {
         level = level > 5 ? 5 : (level < 1 ? 1 : level)
         let levelHex = '3' + level
         serial.writeBuffer(Buffer.fromHex("FD0008010172696E675F" + levelHex))
+    }
+
+    /**
+     * On Message Log
+     * @param handler Connect callback
+     */
+    //% blockId=on_tts_msg_log block="监听tts日志"
+    //% weight=-5
+    export function on_tts_msg_log(
+        handler: (msg: string) => void,
+    ): void {
+        writeLog = handler
     }
 }
