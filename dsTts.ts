@@ -181,7 +181,7 @@ namespace DsTTS {
 
     //% block="铃声[1-5] 数值 %level"
     //% level.defl=1
-    //% weight=0
+    //% weight=1
     export function play_sound_ring(level: number = 1) {
         level = level > 5 ? 5 : (level < 1 ? 1 : level)
         let levelHex = '3' + level
@@ -193,7 +193,7 @@ namespace DsTTS {
      * @param handler Connect callback
      */
     //% blockId=on_tts_msg_log block="监听tts日志"
-    //% weight=-5
+    //% weight=0
     export function on_tts_msg_log(
         handler: (msg: string) => void,
     ): void {
