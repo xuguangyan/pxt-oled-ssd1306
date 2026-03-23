@@ -3,7 +3,7 @@
  */
 //% block="工具库" color=#276f86 icon="\uf0ad"
 //% groups="['string', 'other']"
-export namespace DsTools {
+namespace DsTools {
 
     /**
      * lastIndexOf
