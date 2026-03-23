@@ -101,8 +101,8 @@ namespace DsEsp8266 {
    * Initialize Wifi
    */
   //% block="初始化wifi|RX %tx|TX %rx|Baud rate %baudrate"
-  //% tx.defl=SerialPin.P0
-  //% rx.defl=SerialPin.P1
+  //% tx.defl=SerialPin.P13
+  //% rx.defl=SerialPin.P12
   //% weight=100
   export function initWifi(
     tx: SerialPin,

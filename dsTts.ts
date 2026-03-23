@@ -19,8 +19,8 @@ namespace DsTTS {
     }
 
     //% block="初始化合成|RX %tx|TX %rx|Baud rate %baudrate"
-    //% tx.defl=SerialPin.P12
-    //% rx.defl=SerialPin.P13
+    //% tx.defl=SerialPin.P0
+    //% rx.defl=SerialPin.P1
     //% baudrate.defl=BaudRate.BaudRate9600
     //% weight=99
     export function initTTS(
