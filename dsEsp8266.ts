@@ -1,5 +1,3 @@
-import { DsTools } from './dsTools'
-
 /**
  * Microbit for ESP8266 Wifi modules
  */

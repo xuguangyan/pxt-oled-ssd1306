@@ -1,4 +1,4 @@
-export namespace DsFonts {
+namespace DsFonts {
     // 英文字符集（即95个ASCII码可显字符，范围[32-126]）
     export const font_en = ' !"#$%&\'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~'
     // 5x8英文字库（点阵方向90度，每字占5x2=10个hex字符，序号为charCodeAt码点）

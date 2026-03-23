@@ -1,6 +1,3 @@
-import { DsTools } from './dsTools'
-import { DsFonts } from './dsFont'
-
 // 命令行：ts-node testx.ts
 const char = '你'
 console.log(char.charCodeAt(0))

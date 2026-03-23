@@ -1,6 +1,3 @@
-import { DsTools } from './dsTools'
-import { DsCharset } from './dsCharset'
-
 /**
  * 编码类型
  */

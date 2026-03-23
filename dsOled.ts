@@ -1,6 +1,3 @@
-import { DsTools } from './dsTools'
-import { DsFonts } from './dsFont'
-
 declare interface Math {
     floor(x: number): number;
 }
